@@ -1,8 +1,9 @@
 require 'test_helper'
+require 'byebug'
+
 require 'active_record'
 require 'muffin_blog/app/models/application_record'
 require 'muffin_blog/app/models/post'
-require 'byebug'
 
 class ActiveRecordTest < Minitest::Test
   def setup
@@ -38,5 +39,15 @@ class ActiveRecordTest < Minitest::Test
     assert_kind_of Array, rows
     row = rows.first
     assert_equal [:id, :title, :body, :created_at, :updated_at], row.keys
+  end
+
+  def test_where
+    relation = Post.where('id = 1').where('title IS NOT NULL')
+    assert_equal 'SELECT * FROM posts WHERE id = 1 AND title IS NOT NULL', relation.to_sql
+    post = relation.first
+    assert_kind_of Post, post
+    assert_equal Post, post.class
+    assert_equal 1, post.id
+    assert_equal 'Hey', post.title
   end
 end

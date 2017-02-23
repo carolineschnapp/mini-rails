@@ -1,16 +1,20 @@
 module ActiveRecord
   class Base
     class << self
-      def class_name
+      def table_name
         name.downcase + 's'
       end
 
       def all
-        find_by_sql("SELECT * from #{class_name}")
+        Relation.new(self)
+      end
+
+      def where(*args)
+        all.where(*args)
       end
 
       def find(id)
-        find_by_sql("SELECT * from #{class_name} WHERE id = #{id.to_i}").first
+        all.where("id = #{id.to_i}").first
       end
 
       def establish_connection(options)
@@ -19,14 +23,6 @@ module ActiveRecord
 
       def connection
         @@connection
-      end
-
-      def find_by_sql(sql)
-        connection
-          .execute(sql)
-          .map do |attributes|
-            new(attributes)
-          end
       end
 
       def find_by_sql(sql)
@@ -47,7 +43,7 @@ module ActiveRecord
     end
 
     def method_missing(name, *args)
-      columns = self.class.connection.columns(self.class.class_name)
+      columns = self.class.connection.columns(self.class.table_name)
       if columns.include?(name)
         @attributes[name]
       else
