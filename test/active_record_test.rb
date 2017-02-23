@@ -25,6 +25,14 @@ class ActiveRecordTest < Minitest::Test
     assert_equal 'Hey', post.title
   end
 
+  def test_all
+    post = Post.all.first
+    assert_kind_of Post, post
+    assert_equal Post, post.class
+    assert_equal 1, post.id
+    assert_equal 'Hey', post.title
+  end
+
   def test_execute_sql
     rows = Post.connection.execute('SELECT * FROM posts')
     assert_kind_of Array, rows

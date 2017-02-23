@@ -19,11 +19,17 @@ module ActiveRecord
     end
 
     def self.all
-      connection.execute("SELECT * from posts")
+      connection
+        .execute("SELECT * from posts")
+        .map do |attributes|
+          new(attributes)
+        end
     end
 
     def self.find(id)
-      attributes = connection.execute("SELECT * from posts WHERE id = #{id.to_i}").first
+      attributes = connection
+        .execute("SELECT * from posts WHERE id = #{id.to_i}")
+        .first
       new(attributes)
     end
 
